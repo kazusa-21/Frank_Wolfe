@@ -1,0 +1,133 @@
+!wget "https://raw.githubusercontent.com/nagae/UrbanRoadNetworkAnalyses/master/TNTP.py"
+!rm -rf data
+!git clone --branch "patch-1" "https://github.com/nagae/TransportationNetworks.git" data
+import numpy as np
+import scipy as sp
+from scipy import sparse
+from operator import itemgetter, attrgetter
+from IPython.lib.pretty import pprint
+import TNTP 
+import importlib
+importlib.reload(TNTP)
+root = 'data' # データフォルダのルート
+dir_name ="Braess-Example"
+ntw = TNTP.Network(root, dir_name)
+#2
+#使用するファイルを指定してデータを抽出
+w = sparse.csr_matrix((ntw.fftt, zip(*ntw.links)))
+#抽出された重み行列を標準の行列として表示させる
+pprint(w.toarray().tolist(),max_seq_length=10)
+#出てくるのは各リンクの交通量
+#3
+#重み行列が求まっているので、ダイクストラ法で最短経路を求める
+orig_bn = 1
+orig = ntw.nid_of[orig_bn]
+pi,pred = sparse.csgraph.dijkstra(w,indices=orig,return_predecessors=True)
+#4
+x = np.zeros(ntw.num_links) # Link flow of All-or-Nothing assignment
+X = np.zeros(ntw.num_nodes) # Total traffic for each node to the corresponding subtree on the shortest path
+for j, pi_j in sorted(enumerate(pi),key=itemgetter(1,0), reverse=True): # sort the destinations by the shortest path in reverse order
+    j_bn = ntw.nodes_bn[j] #
+    i = pred[j] # predecessor of node j
+    if i == -9999: # if node j does not have predecessor (i.e. there is no path from origin to node j)
+        if j == orig: continue
+        if j is not orig and j_bn in ntw.trips[orig_bn] and ntw.trips[orig_bn][j_bn] > 0:
+            print("trip demand for O-D pair(%d,%d) can not be assigned"%(orig_bn,j_bn))
+        continue
+    lid = ntw.lid_of[i,j]
+    x[lid] += X[j]
+    if j_bn in ntw.trips[orig_bn]:
+        x[lid] += ntw.trips[orig_bn][j_bn]
+    X[i] += x[lid]
+#5
+print("pi:")#最短経路費用
+pprint(pi.tolist(), max_seq_length=10)
+print("pred:")#先行ポインタ
+pprint(pred.tolist(), max_seq_length=10)
+print("x:")#リンク交通量
+pprint({(ntw.nodes[i],ntw.nodes[j]):x[lid] for lid, (i,j) in enumerate(ntw.links)}, max_seq_length=10)
+#6
+#ステップサイズを変えた時の目的関数(一定)
+from matplotlib import pyplot as plt
+
+x0 = ntw.AoN(ntw.t_mat()) # AoN assignment only based on the free flow travel time
+y0 = ntw.AoN(ntw.t_mat(x0))
+#print(ntw.Z((1-alpha)*x0+alpha*y0))  #Zが分からないため計算の確認ができない。恐らくx0とy0は全く同じなのでステップサイズがどんな値になっても変わらない?(x2=x1+ad)
+Dalpha = 0.01
+alpha_set = np.arange(0, 1+Dalpha, Dalpha)
+plt.plot(alpha_set, [ntw.Z((1-alpha)*x0+alpha*y0) for alpha in alpha_set])
+#黄金分割法を用いたステップサイズの決定
+#差があればステップサイズは最も小さ苦なる部分で収束するはず
+#そもそも変化しないため更新されず、ステップサイズが１になっているのではないか
+from scipy import optimize
+g = lambda alpha: ntw.Z((1-alpha)*x0+alpha*y0) #無名関数。Zの扱いについては不明 目的関数Zってどこで定義している？
+res = optimize.minimize_scalar(g, bounds=[0,1], method='bounded')
+alpha = res.x
+
+x = ntw.AoN_init()  # give x0 as the first tentative solution
+# evaluating this cell updates the tentative solution
+y = ntw.AoN(ntw.t_mat(x))
+alpha = ntw.FindAlpha(x,y)#黄金分割法により見つかったステップサイズ
+alpha_set = np.arange(0, 1+Dalpha, Dalpha)
+plt.plot(alpha_set, [ntw.Z((1-alpha)*x+alpha*y) for alpha in alpha_set])
+plt.axvline(x = alpha, color='black', linestyle='dashed', linewidth=1)
+x += alpha*(y-x)
+#print("Z=%8.2f"%ntw.Z(x))
+#7
+max_itr = 500 # the upper limit of iteration
+TOL_Z_rate = 1e-6 # epsilon_Z
+TOL_x_rate = 1e-5 # epsilon_x
+TOL_pi_rate = 1e-5 # epsilon_pi
+
+# Lists for log
+Z = list() # objective function at each iteration
+Z_rate = list() # change rate in the objective function
+x_rate = list() # change rate in the link flow
+pi_rate = list() # change rate in the shortest travel time
+
+# initialize
+t0 = ntw.t_mat()
+#print(t0)
+
+x0 = ntw.AoN(t0)
+pi0 = ntw.ShortestTravelTime(t0)
+Z.append(ntw.Z(x0))
+
+# main loop
+for itr in range(max_itr):
+    # Obtain the auxliary solution as the all-or-nothing assignment
+    y = ntw.AoN(ntw.t_mat(x0))
+    # Find the best step size
+    alpha = ntw.FindAlpha(x0,y)
+    # Update the tentative solution
+    x = x0 + alpha*(y-x0)
+    pi = ntw.ShortestTravelTime(ntw.t_mat(x))
+    # Calculate change rates and update logs
+    Z.append(ntw.Z(x))
+    Z_rate.append((-Z[-1]+Z[-2])/Z[-2])
+    pi_rate.append(sum(abs(pi[pi0>0]-pi0[pi0>0])/pi0[pi0>0]))
+    x_rate.append(np.sqrt(np.sum((x0-x)**2))/(np.sum(x0)))
+    # Convergence check
+    if Z_rate[-1] < TOL_Z_rate or x_rate[-1] < TOL_x_rate or pi_rate[-1] < TOL_pi_rate:
+        break
+    # Memorize the current solution
+    x0 = x.copy()
+    pi0 = pi.copy()
+    Z0 = Z
+print(x)
+print(ntw.T([4.00358217, 1.99641783, 1.9917091 , 2.01187307, 4.0082909]))#各リンク費用を表示
+print(Z) #ここより前
+plt.subplot(1,2,1)
+plt.plot(Z,'C0', label="Z")
+plt.legend()
+plt.xscale('log')
+plt.yscale('linear')
+plt.subplot(1,2,2)
+plt.plot(Z_rate, 'C1',label="Z rate")
+plt.plot(x_rate, 'C2', label="x rate")
+plt.plot(pi_rate, 'C3', label="$\pi$ rate")
+plt.legend()
+plt.yscale('log')
+#8
+plt.bar(range(ntw.num_links), x)
+#(O,D)=(1,4)は交通量が6
