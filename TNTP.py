@@ -15,6 +15,9 @@ def_max_itr = 1000
 def_TOL_Z_rate = 1e-6
 def_TOL_x_rate = 1e-4
 def_TOL_pi_rate = 1e-4
+NA1=1/8*np.array([[3,1,-2,5,-1], [2,-2,4,-2,2],[-1,5,-2,1,3]])
+
+
 
 #
 # Parameters for the solution algorithms
@@ -81,7 +84,7 @@ class Network :
     def T(self, x):
         return self.fftt*x*(1+self.b/(1+self.power)*(x/self.capacity)**self.power)
     def P(self, x):
-        return self.fftt
+        return self.fftt*x
     def Z(self, x):
         return sum(self.T(x))
     
