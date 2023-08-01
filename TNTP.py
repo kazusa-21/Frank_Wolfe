@@ -83,8 +83,8 @@ class Network :
     #
     def T(self, x):
         return self.fftt*x*(1+self.b/(1+self.power)*(x/self.capacity)**self.power)
-    def P(self, x):
-        return self.fftt*x
+    def P(x):
+        return NA1*x
     def Z(self, x):
         return sum(self.T(x))
     
