@@ -87,7 +87,7 @@ class Network :
         return sum(NA3)
     def Z(self, x):
         theta=4
-        return sum(self.T(x)+1/theta*self.P(x)
+        return sum(self.T(x)+1/theta*self.P(x))
     
     #
     # Shoretst travel time for every O-D pairs (for convergence test)
