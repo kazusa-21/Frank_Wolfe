@@ -80,8 +80,14 @@ class Network :
     #
     def T(self, x):
         return self.fftt*x*(1+self.b/(1+self.power)*(x/self.capacity)**self.power)
+    def P(self, x):
+        NA1=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])
+        NA2=np.sum(NA1*x,axis=1)
+        NA3=NA1*NA2
+        return sum(NA3)
     def Z(self, x):
-        return sum(self.T(x))
+        theta=4
+        return sum(self.T(x)+1/theta*self.P(x)
     
     #
     # Shoretst travel time for every O-D pairs (for convergence test)
