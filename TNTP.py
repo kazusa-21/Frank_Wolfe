@@ -1,6 +1,7 @@
 #test
 
 import numpy as np
+import matplotlib.pyplot as plt
 import scipy as sp
 from scipy import sparse, optimize
 from operator import itemgetter, attrgetter
