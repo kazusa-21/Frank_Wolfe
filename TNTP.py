@@ -83,8 +83,9 @@ class Network :
     def P(self, x):
         NA1=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])
         NA2=np.sum(NA1*x,axis=1)
-        NA3=NA1*NA2
-        return sum(NA3)
+        NA3=np.log(NA2)
+        NA4=NA2*NA3
+        return sum(NA4)
     def Z(self, x):
         theta=4
         return sum(self.T(x)+1/theta*self.P(x))
