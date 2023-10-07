@@ -138,6 +138,21 @@ class Network :
     # Find the initial solution as an AoN with the free-flow travel time
     def AoN_init(self):
         return self.AoN(self.t_mat())
+
+    def logit_assignment(self,beta):
+        num_links = len(link_costs)
+        probabilities = np.zeros(num_links)
+        
+        for i in range(num_links):
+            numerator = np.exp(-beta * link_costs[i])
+            denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
+            probabilities[i] = numerator / denominator
+        return probabilities
+
+    def calculate_link_costs(network):
+        num_links = network['num_links']
+        link_costs = ntw.fftt
+        return link_costs
     
     #
     # Linear search for the optimal step-size 
