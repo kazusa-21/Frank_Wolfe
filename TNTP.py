@@ -139,7 +139,7 @@ class Network :
     def AoN_init(self):
         return self.AoN(self.t_mat())
 
-    def logit_assignment(self,beta):
+    def logit_assignment(link_costs,beta):
         num_links = len(link_costs)
         probabilities = np.zeros(num_links)
         
@@ -149,9 +149,9 @@ class Network :
             probabilities[i] = numerator / denominator
         return probabilities
 
-    def calculate_link_costs(network):
+    def calculate_link_costs(self,network):
         num_links = network['num_links']
-        link_costs = ntw.fftt
+        link_costs = self.fftt
         return link_costs
     
     #
