@@ -9,6 +9,7 @@ import pandas as pd
 import re
 import time
 import glob
+import scipy.optimize as optimize
 
 default_root = '.'
 net_suffix = 'net.tntp'
@@ -138,8 +139,22 @@ class Network :
     # Find the initial solution as an AoN with the free-flow travel time
     def AoN_init(self):
         return self.AoN(self.t_mat())
+
+    def logit_assignment(self,beta):
+        num_links = len(link_costs)
+        probabilities = np.zeros(num_links)
+        
+        for i in range(num_links):
+            numerator = np.exp(-beta * link_costs[i])
+            denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
+            probabilities[i] = numerator / denominator
+        return probabilities
+
+    def calculate_link_costs(network):
+        num_links = network['num_links']
+        link_costs = ntw.fftt
+        return link_costs
     
-    #
     # Linear search for the optimal step-size 
     #
     def FindAlpha(self, x, y):
@@ -246,13 +261,6 @@ def read_net(fname):
 
         return net.dropna().iloc[1:]
 
-#
-# Demo
-#
-if __name__ == '__main__':
-    t0 = time.time()
-    root = 'data'
-    dir_name = 'SiouxFalls'
     ntw = TNTP.Network(root, dir_name)
     x = ntw.SolveUE()
     t1 = time.time()
