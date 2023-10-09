@@ -158,8 +158,7 @@ class Network :
 
     def re_logit_assignment(self,link_x,beta,Q): #ロジット配分されたリンク交通量をもとに再度ロジット配分を行う(リンク交通量を返す)
         t1=self.t(link_x)
-        re_route_costs=self.C(t1)
-        y0=self.logit_assignment(re_route_costs,beta,Q)
+        y0=self.logit_assignment(t1,beta,Q)
         return y0
         
         
