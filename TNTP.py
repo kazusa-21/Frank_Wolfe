@@ -151,7 +151,9 @@ class Network :
             denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
             probabilities[i] = numerator / denominator
             xc=probabilities*Q
-            xd=self.re_link_costs(xc)
+            ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
+            link_T=ln_matrix*xc
+            link_T1=np.sum(link_T,axis=0)
         return xd
 
     def re_link_costs(self,x): #経路交通量xをリンク交通量に変更
