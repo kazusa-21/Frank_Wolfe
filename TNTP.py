@@ -154,7 +154,7 @@ class Network :
             xd=self.re_link_costs(xc)
         return xd
 
-    def re_link_costs(x): #経路交通量xをリンク交通量に変更
+    def re_link_costs(self,x): #経路交通量xをリンク交通量に変更
         ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
         return np.sum(ln_matrix*x,axis=1)
 
