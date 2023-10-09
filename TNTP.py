@@ -1,5 +1,3 @@
-#test
-
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
@@ -144,16 +142,29 @@ class Network :
     def AoN_init(self):
         return self.AoN(self.t_mat())
 
-    def logit_assignment(link_costs,beta):
-        num_links = len(link_costs)
+    def logit_assignment(self,link_costs,beta,Q): #リンク費用を引数として、ロジット配分したリンク交通量を返す
+        route_costs=self.C(link_costs)
+        num_links = len(route_costs)
         probabilities = np.zeros(num_links)
-        
         for i in range(num_links):
             numerator = np.exp(-beta * link_costs[i])
             denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
             probabilities[i] = numerator / denominator
-        return probabilities
+            xc=probabirithies*Q
+            xd=self.re_link_costs(xc)
+        return xd
 
+    def re_link_costs(x): #経路交通量xをリンク交通量に変更
+        ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
+        return np.sum(ln_matrix*x,axis=1)
+
+    def re_logit_assignment(self,link_x,beta,Q): #ロジット配分されたリンク交通量をもとに再度ロジット配分を行う(リンク交通量を返す)
+        t1=self.t(link_x)
+        re_route_costs=self.C(t1)
+        y0=self.logit_assignment(re_route_costs,beta)
+        return y0
+        
+        
     def calculate_link_costs(self,network):
         num_links = network['num_links']
         link_costs = self.fftt
