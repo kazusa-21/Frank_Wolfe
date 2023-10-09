@@ -150,7 +150,7 @@ class Network :
             numerator = np.exp(-beta * link_costs[i])
             denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
             probabilities[i] = numerator / denominator
-            xc=probabirithies*Q
+            xc=probabilities*Q
             xd=self.re_link_costs(xc)
         return xd
 
