@@ -156,12 +156,6 @@ class Network :
             link_T1=np.sum(link_T,axis=0)
         return link_T1
 
-    def re_link_costs(self,x): #経路交通量xをリンク交通量に変更
-        ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
-        link_T=ln_matrix*x
-        link_T1=np.sum(link_T,axis=0)
-        return link_T1
-
     def re_logit_assignment(self,link_x,beta,Q): #ロジット配分されたリンク交通量をもとに再度ロジット配分を行う(リンク交通量を返す)
         t1=self.t(link_x)
         re_route_costs=self.C(t1)
