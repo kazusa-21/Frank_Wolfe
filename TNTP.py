@@ -147,8 +147,8 @@ class Network :
         num_links = len(route_costs)
         probabilities = np.zeros(num_links)
         for i in range(num_links):
-            numerator = np.exp(-beta * link_costs[i])
-            denominator = sum(np.exp(-beta * link_costs[j]) for j in range(num_links))
+            numerator = np.exp(-beta * route_costs[i])
+            denominator = sum(np.exp(-beta * route_costs[j]) for j in range(num_links))
             probabilities[i] = numerator / denominator
             xc=probabilities*Q
             ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
