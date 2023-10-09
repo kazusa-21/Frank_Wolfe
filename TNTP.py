@@ -154,7 +154,7 @@ class Network :
             ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
             link_T=ln_matrix*xc
             link_T1=np.sum(link_T,axis=0)
-        return xd
+        return link_T1
 
     def re_link_costs(self,x): #経路交通量xをリンク交通量に変更
         ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
