@@ -81,9 +81,9 @@ class Network :
     #
     # Integral of the link performance function and the objective function of the equivalent convex programming 
     #
-    def T(self, x):
+    def T(self, x): 
         return self.fftt*x*(1+self.b/(1+self.power)*(x/self.capacity)**self.power)
-    def P(self, x):
+    def P(self, x):#目的関数第二項
         NA1=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])
         NA2=np.sum(NA1*x,axis=1)
         NA3=np.log(NA2)
@@ -92,6 +92,11 @@ class Network :
     def Z(self, x):
         theta=4
         return sum(self.T(x)+1/theta*self.P(x))
+    def C(self,x): #リンク交通量を元に経路費用を算出する
+        NB1=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])#リンク交通量
+        NB2=np.sum(NA1*x,axis=1) #経路交通量
+        NB3=self.t(NB2)
+        return NB3
     
     #
     # Shoretst travel time for every O-D pairs (for convergence test)
