@@ -92,9 +92,10 @@ class Network :
         return sum(self.T(x)+1/theta*self.P(x))
     def C(self,x): #リンク交通量を元に経路費用を算出する
         NB1=self.t(x)
-        NB2=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])#リンク交通量
-        NB3=np.sum(NB1*NB2,axis=1) #経路交通量
-        return NB3
+        NB2=1/8*np.array([[3,1,5,-2,-1],[2,-2,-2,4,2],[-1,5,1,-2,3]])#リンク交通量使わない
+        NB3=np.array([[1,0,1,0,0],[1,0,0,1,1],[0,1,0,0,1]])
+        NB4=np.sum(NB1*NB3,axis=1) #経路交通量
+        return NB4
     
     #
     # Shoretst travel time for every O-D pairs (for convergence test)
@@ -151,7 +152,7 @@ class Network :
             denominator = sum(np.exp(-beta * route_costs[j]) for j in range(num_links))
             probabilities[i] = numerator / denominator
             xc=probabilities*Q
-            ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])
+            ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])#直す
             link_T=ln_matrix*xc
             link_T1=np.sum(link_T,axis=1)
         return link_T1
