@@ -82,7 +82,7 @@ class Network :
     def T(self, x): 
         return self.fftt*x*(1+self.b/(1+self.power)*(x/self.capacity)**self.power)
     def P(self, x):#目的関数第二項
-        NA1=1/8*np.array([[3,1,-2,5,-1],[2,-2,4,-2,2],[-1,5,-2,1,3]])
+        NA1=1/8*np.array([[3,1,5,-2,-1],[2,-2,-2,4,2],[-1,5,1,-2,3]])
         NA2=np.sum(NA1*x,axis=1)
         NA3=np.log(NA2)
         NA4=NA2*NA3
