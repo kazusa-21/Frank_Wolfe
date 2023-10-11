@@ -154,7 +154,6 @@ class Network :
             xc=probabilities*Q #経路交通量
             ln_matrix=np.array([[1,1,0],[0,0,1],[1,0,0],[0,1,0],[0,1,1]])#直した
             link_T=ln_matrix*xc
-            print(link_T)
             link_T1=np.sum(link_T,axis=1)
         return link_T1
 
