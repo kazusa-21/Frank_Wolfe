@@ -90,7 +90,7 @@ class Network :
     def Z(self, x):
         theta=4
         return sum(self.T(x)+1/theta*self.P(x))
-    def C(self,x): #リンク交通量を元に経路費用を算出する
+    def C(self,x): #リンク交通量を元に経路費用を算出する.計算確認済み
         NB1=self.t(x)
         NB2=1/8*np.array([[3,1,5,-2,-1],[2,-2,-2,4,2],[-1,5,1,-2,3]])#リンク交通量使わない
         NB3=np.array([[1,0,1,0,0],[1,0,0,1,1],[0,1,0,0,1]])
@@ -148,12 +148,13 @@ class Network :
         num_links = len(route_costs)
         probabilities = np.zeros(num_links)
         for i in range(num_links):
-            numerator = np.exp(-beta * route_costs[i])
+            numerator = np.exp(-beta * route_costs[i])#計算確認済み
             denominator = sum(np.exp(-beta * route_costs[j]) for j in range(num_links))
-            probabilities[i] = numerator / denominator
-            xc=probabilities*Q
-            ln_matrix=np.array([[1,1,0],[0,0,1],[0,1,0],[1,0,0],[0,1,1]])#直す
+            probabilities[i] = numerator / denominator #probabilitiesの合計が１になることを確認済み
+            xc=probabilities*Q #経路交通量
+            ln_matrix=np.array([[1,1,0],[0,0,1],[1,0,0],[0,1,0],[0,1,1]])#直した
             link_T=ln_matrix*xc
+            print(link_T)
             link_T1=np.sum(link_T,axis=1)
         return link_T1
 
