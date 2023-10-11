@@ -154,7 +154,7 @@ class Network :
             xc=probabilities*Q #経路交通量
             ln_matrix=np.array([[1,1,0],[0,0,1],[1,0,0],[0,1,0],[0,1,1]])#直した
             link_T=ln_matrix*xc
-            link_T1=np.sum(link_T,axis=1)
+            link_T1=np.sum(link_T,axis=1)#ロジット配分に基づいてリンク交通量が求められていることを確認済み
         return link_T1
 
     def re_logit_assignment(self,link_x,beta,Q): #ロジット配分されたリンク交通量をもとに再度ロジット配分を行う(リンク交通量を返す)
