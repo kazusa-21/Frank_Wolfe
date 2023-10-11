@@ -149,7 +149,9 @@ class Network :
         probabilities = np.zeros(num_links)
         for i in range(num_links):
             numerator = np.exp(-beta * route_costs[i])#計算確認済み
+            
             denominator = sum(np.exp(-beta * route_costs[j]) for j in range(num_links))
+            print(numerator / denominator)
             probabilities[i] = numerator / denominator #probabilitiesの合計が１になることを確認済み
             xc=probabilities*Q #経路交通量
             ln_matrix=np.array([[1,1,0],[0,0,1],[1,0,0],[0,1,0],[0,1,1]])#直した
