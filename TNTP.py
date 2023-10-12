@@ -89,7 +89,7 @@ class Network :
         return sum(NA4)
     def Z(self, x):
         theta=4
-        return sum(self.T(x)+1/theta*self.P(x))
+        return sum(self.T(x))+1/theta*self.P(x)
     def C(self,x): #リンク交通量を元に経路費用を算出する.計算確認済み
         NB1=self.t(x)
         NB2=1/8*np.array([[3,1,5,-2,-1],[2,-2,-2,4,2],[-1,5,1,-2,3]])#リンク交通量使わない
